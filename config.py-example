@@ -1,0 +1,19 @@
+# Your personal token for the Noko API
+NOKO_TOKEN = ""
+
+# Mapping of sides of Zei to Noko projects/tags.
+# Each side must have a project set if you want to log time on that side.
+ORIENTATION_MAPPING = {
+    0: (None, ""),  # on stand
+
+    1: ("My Cool Project", ""),
+    2: ("Another Project", "#development"),
+    3: (None, ""),
+    4: (None, ""),
+    5: ("Internal", "#call"),
+    6: (None, ""),
+    7: (None, ""),
+    8: (None, ""),
+
+    9: ("<Other>", ""),  # upside down. Special state that shows a dialog to enter project name.
+}
