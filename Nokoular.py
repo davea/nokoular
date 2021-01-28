@@ -42,7 +42,10 @@ class NokoularApp(rumps.App):
         )
 
         self._project_window = rumps.Window(
-            title="Which project?", dimensions=(320, 40)
+            title="Which project?",
+            dimensions=(320, 40),
+            options=self.noko.projects.keys(),
+            options_empty="-- Select a project --",
         )
 
     @rumps.clicked("Save entry...")
@@ -81,10 +84,12 @@ class NokoularApp(rumps.App):
             # Zei is upside down, which is a special state to indicate
             # no specific project has been assigned, so ask the user what
             # project it is
-            project = self._project_window.run().text
-            if "," in project:
-                project, tags = project.split(",", 1)
-                tags = tags.strip()
+            response = self._project_window.run()
+            project = response.option
+            if response.text:
+                tags = response.text.strip()
+            if project == "-- Select a project --":
+                project = None
 
         start_time = datetime.utcnow()
 
