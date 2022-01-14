@@ -10,13 +10,16 @@ objc.loadBundle(
     "CoreBluetooth",
     globals(),
     bundle_path=objc.pathForFramework(
-        "/System/Library/Frameworks/IOBluetooth.framework/Versions/A/Frameworks/CoreBluetooth.framework"
+        "/System/Library/Frameworks/CoreBluetooth.framework"
     ),
 )
 
 
 SERVICE_UUID = "C7E70010-C847-11E6-8175-8C89A55D403C"
 CHAR_UUID = "C7E70012-C847-11E6-8175-8C89A55D403C"
+
+BATTERY_SERVICE = "180F"
+BATTERY_CHARACTERISTIC = ""
 
 
 class Zei(NSObject):
@@ -27,6 +30,8 @@ class Zei(NSObject):
 
     _orientation = -1
     _connected = False
+
+    reconnect = True
 
     def initWithDelegate_(self, delegate):
         super().init()
@@ -73,9 +78,11 @@ class Zei(NSObject):
             self._delegate.zei_didChangeConnectionState_(self, True)
 
     def centralManager_didDisconnectPeripheral_error_(self, manager, peripheral, error):
-        logging.debug(f"Disconnected {peripheral.name()}")
+        logging.debug(f"Disconnected {peripheral.name()}: {error}")
         if self._delegate:
             self._delegate.zei_didChangeConnectionState_(self, False)
+        if self.reconnect:
+            self.connect()
 
     def centralManager_didUpdatePeripheralConnectionState_(self, manager, peripheral):
         logging.debug("centralManager_didUpdatePeripheralConnectionState_")
@@ -112,6 +119,7 @@ class Zei(NSObject):
     def peripheral_didUpdateValueForCharacteristic_error_(
         self, peripheral, characteristic, error
     ):
+        value = characteristic.value().bytes().tobytes()
         logging.debug("peripheral_didUpdateValueForCharacteristic_error_ called")
         value = characteristic.value().bytes().tobytes()
         orientation = int.from_bytes(value, byteorder="big")
@@ -122,5 +130,5 @@ class Zei(NSObject):
 
     def respondsToSelector_(self, selector):
         responds = super().respondsToSelector_(selector)
-        logging.debug("%s %s", selector, responds)
+        logging.debug("respondsToSelector_ %s %s", selector, responds)
         return responds

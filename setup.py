@@ -5,9 +5,11 @@ DATA_FILES = []
 OPTIONS = {
     "argv_emulation": True,
     "plist": {
-        "LSUIElement": True,
+        # "LSUIElement": True, # Monterey doesn't let you access Bluetooth with this, sigh.
         "NSUserNotificationAlertStyle": "alert",
         "CFBundleIdentifier": "me.davea.nokoular",
+        "NSBluetoothAlwaysUsageDescription": "This app uses Bluetooth",
+        "NSBluetoothPeripheralUsageDescription": "This app uses Bluetooth peripherals",
     },
     "packages": ["rumps", "humanfriendly", "requests"],
 }

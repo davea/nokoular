@@ -1,5 +1,5 @@
-humanfriendly==4.18
-py2app==0.19
-pyobjc-framework-CoreBluetooth==5.2
-requests==2.22.0
--e git+git@github.com:davea/rumps.git@2321c4182fdec1be47ef2b28770c44aa82f79345#egg=rumps
+humanfriendly==10.0
+py2app==0.26.1
+pyobjc-framework-CoreBluetooth==8.1
+requests==2.27.1
+git+https://github.com/davea/rumps@374ce944d669c75ae102bb0b4c188daf41f27e54#egg=rumps

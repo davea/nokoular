@@ -8,8 +8,8 @@ clean:
 	rm -rf build/ dist/ venv/
 
 run:
-	dist/Nokoular.app/Contents/MacOS/Nokoular
+	echo open -n -W --stdin '$$TTY' --stdout '$$TTY' --stderr '$$TTY' dist/Nokoular.app
 
 venv:
-	python3 -m venv venv
+	/opt/homebrew/bin/python3.9 -m venv venv
 	venv/bin/pip install -r requirements.txt
