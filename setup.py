@@ -8,8 +8,8 @@ OPTIONS = {
         # "LSUIElement": True, # Monterey doesn't let you access Bluetooth with this, sigh.
         "NSUserNotificationAlertStyle": "alert",
         "CFBundleIdentifier": "me.davea.nokoular",
-        "NSBluetoothAlwaysUsageDescription": "This app uses Bluetooth",
-        "NSBluetoothPeripheralUsageDescription": "This app uses Bluetooth peripherals",
+        "NSBluetoothAlwaysUsageDescription": "To connect to Timeular Zei",
+        "NSBluetoothPeripheralUsageDescription": "To connect to Timeular Zei",
     },
     "packages": ["rumps", "humanfriendly", "requests"],
     "iconfile": "Nokoular.icns",
