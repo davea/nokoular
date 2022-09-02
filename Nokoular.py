@@ -111,7 +111,7 @@ class NokoularApp(rumps.App):
     def zei_didUpdateOrientation_(self, zei, orientation):
         self.title = f"Z:{orientation}"
 
-        new_project, new_tags = ORIENTATION_MAPPING[orientation]
+        new_project, new_tags = ORIENTATION_MAPPING.get(orientation, (None, ""))
 
         # if the Zei has been rotated from a side with a project/tags associated,
         # need to capture info from the user and stop the timer on Noko.
