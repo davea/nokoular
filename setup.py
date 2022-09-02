@@ -12,6 +12,7 @@ OPTIONS = {
         "NSBluetoothPeripheralUsageDescription": "This app uses Bluetooth peripherals",
     },
     "packages": ["rumps", "humanfriendly", "requests"],
+    "iconfile": "Nokoular.icns",
 }
 
 setup(
