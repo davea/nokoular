@@ -4,6 +4,7 @@ from textwrap import shorten
 
 import rumps
 from humanfriendly import format_timespan
+from AppKit import NSTextField, NSApplication
 
 from noko import Noko
 from timeular import Zei
@@ -20,6 +21,34 @@ log = logging.getLogger(__name__)
 rumps.debug_mode(True)
 
 app = None
+
+NSEventModifierFlagDeviceIndependentFlagsMask = 0xFFFF0000
+NSEventModifierFlagCommand = 1 << 20
+NSEventTypeKeyDown = 10
+
+
+class MyTextField(NSTextField):
+    def performKeyEquivalent_(self, event):
+        _app = NSApplication.sharedApplication()
+        selectors = {
+            "a": "selectAll_",
+            "v": "paste_",
+            "c": "paste",
+        }
+        if event.type() == NSEventTypeKeyDown:
+            flags = event.modifierFlags()
+            if (
+                flags & NSEventModifierFlagDeviceIndependentFlagsMask
+                == NSEventModifierFlagCommand
+            ):
+                log.debug(f"⌘{event.charactersIgnoringModifiers()}")
+                if selector := selectors.get(event.charactersIgnoringModifiers()):
+                    log.debug(selector)
+                    r = _app.sendAction_to_from_(selector, None, self)
+                    log.debug(r)
+                    if r:
+                        return True
+        return super().performKeyEquivalent_(event)
 
 
 class NokoularApp(rumps.App):
@@ -38,7 +67,10 @@ class NokoularApp(rumps.App):
 
     def _setup_windows(self):
         self._description_window = rumps.Window(
-            title="Description", cancel=True, dimensions=(320, 40)
+            title="Description",
+            cancel=True,
+            dimensions=(320, 40),
+            # textfield_cls=MyTextField,
         )
 
         self._project_window = rumps.Window(
@@ -84,8 +116,11 @@ class NokoularApp(rumps.App):
             # Zei is upside down, which is a special state to indicate
             # no specific project has been assigned, so ask the user what
             # project it is
+            log.debug("on other side, running window")
             response = self._project_window.run()
+            log.debug("ran window")
             project = response.option
+            log.debug(f"project: {project}")
             if response.text:
                 tags = response.text.strip()
             if project == "-- Select a project --":
@@ -99,7 +134,9 @@ class NokoularApp(rumps.App):
             start_time -= timedelta(seconds=running_seconds)
 
         self._current_state = (project, tags, start_time)
+        log.debug("updating menu titles")
         self.update_menu_titles()
+        log.debug("updating menu titles; done")
 
     def save_timer_for_project(self, project, description):
         self.noko.stop_timer(project, description)

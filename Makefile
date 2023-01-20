@@ -11,5 +11,5 @@ run:
 	echo open -n -W --stdin '$$TTY' --stdout '$$TTY' --stderr '$$TTY' dist/Nokoular.app
 
 venv:
-	/opt/homebrew/bin/python3.9 -m venv venv
+	/opt/homebrew/bin/python3.11 -m venv venv
 	venv/bin/pip install -r requirements.txt
