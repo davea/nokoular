@@ -8,6 +8,7 @@ from AppKit import NSTextField, NSApplication
 
 from noko import Noko
 from timeular import Zei
+from deck import Deck
 
 from config import NOKO_TOKEN, ORIENTATION_MAPPING
 
@@ -21,6 +22,8 @@ log = logging.getLogger(__name__)
 rumps.debug_mode(True)
 
 app = None
+
+MODE = "StreamDeck"
 
 NSEventModifierFlagDeviceIndependentFlagsMask = 0xFFFF0000
 NSEventModifierFlagCommand = 1 << 20
@@ -54,14 +57,18 @@ class MyTextField(NSTextField):
 class NokoularApp(rumps.App):
     zei = None
     noko = None
+    deck = None
 
     _current_state = None
     _description_window = None
 
     def __init__(self):
-        super().__init__("Z:!")
+        super().__init__("Z:!" if MODE == "Zei" else "D:!")
         self.menu = ["Not logging", "..."]
-        self.zei = Zei.alloc().initWithDelegate_(self)
+        if MODE == "Zei":
+            self.zei = Zei.alloc().initWithDelegate_(self)
+        else:
+            self.deck = Deck.alloc().initWithDelegate_(self)
         self.noko = Noko(NOKO_TOKEN)
         self._setup_windows()
 
@@ -149,7 +156,14 @@ class NokoularApp(rumps.App):
         self.title = f"Z:{orientation}"
 
         new_project, new_tags = ORIENTATION_MAPPING.get(orientation, (None, ""))
+        self.update_project_and_tags(new_project, new_tags)
 
+    def deck_didReceiveButtonPress_(self, deck, button, project, tags):
+        self.title = f"D:{button}"
+
+        self.update_project_and_tags(project, tags)
+
+    def update_project_and_tags(self, new_project, new_tags):
         # if the Zei has been rotated from a side with a project/tags associated,
         # need to capture info from the user and stop the timer on Noko.
         # Once that's done we need to start a timer for the new side
@@ -173,6 +187,8 @@ class NokoularApp(rumps.App):
                     "old_project is None, no timer to stop, and not showing notification."
                 )
                 self.start_timer_for_project(new_project, new_tags)
+            elif old_project == new_project:
+                log.debug("Same project, no need for a notification")
             else:
                 # we need to show a notification for the log which we've just
                 # moved away from, to capture any tags and description from
@@ -198,6 +214,9 @@ class NokoularApp(rumps.App):
 
     def zei_didChangeConnectionState_(self, zei, connected):
         self.title = "Z:OK" if connected else "Z:!"
+
+    def deck_didChangeConnectionState_(self, deck, connected):
+        self.title = "D:OK" if connected else "D:!"
 
 
 @rumps.notifications

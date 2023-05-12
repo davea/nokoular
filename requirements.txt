@@ -1,6 +1,13 @@
 humanfriendly==10.0
 py2app==0.28.5
-pyobjc-framework-CoreBluetooth==9.0.1
-requests==2.28.2
+pyobjc-framework-CoreBluetooth==9.1.1
+requests==2.30.0
+black==23.3.0
+
 # git+https://github.com/davea/rumps@374ce944d669c75ae102bb0b4c188daf41f27e54#egg=rumps
+# StreamDeckLayoutManager==1.0.1
+# streamdeck==0.9.3
+
 -e /Users/davea/Code/rumps
+-e /Users/davea/Code/python-elgato-streamdeck
+-e /Users/davea/Code/StreamDeckLayoutManager
