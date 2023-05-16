@@ -97,10 +97,8 @@ class NokoularApp(rumps.App):
     def refresh_projects(self, _):
         self.noko.refresh_projects()
 
-    @rumps.clicked("Quit")
-    def quit(self, _):
+    def terminate(self):
         self.deck.shutdown()
-        rumps.quit_application()
 
     @rumps.clicked("...")
     def set_description(self, _):
@@ -241,7 +239,7 @@ def notification_handler(data):
 
 def main():
     global app
-    app = NokoularApp(quit_button=None)
+    app = NokoularApp()
     app.run()
 
 
