@@ -1,5 +1,7 @@
 import logging
 from pprint import pprint
+from pathlib import Path
+import json
 
 import requests
 
@@ -29,13 +31,28 @@ class Noko:
     @property
     def projects(self):
         if not self._projects:
-            self._projects = {
+            self._projects = self._load_projects()
+        return self._projects
+
+    def _load_projects(self, use_cache=True):
+        cache_dir = Path("~/.config/Nokoular/cache").expanduser()
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        cached = cache_dir / "noko_projects.json"
+        if use_cache and cached.exists():
+            return json.load(open(cached))
+        else:
+            projects = {
                 p["name"]: p["id"]
                 for p in self._api(
                     "projects", params={"enabled": "true", "per_page": 1_000}
                 )
             }
-        return self._projects
+            with open(cached, "w") as f:
+                json.dump(projects, f)
+            return projects
+
+    def refresh_projects(self):
+        self._projects = self._load_projects(use_cache=False)
 
     def start_timer(self, project, description=None):
         pid = self.projects[project]

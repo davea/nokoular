@@ -93,6 +93,10 @@ class NokoularApp(rumps.App):
         # Acts as if the Zei has been upended to pause tracking.
         self.zei_didUpdateOrientation_(self.zei, 0)
 
+    @rumps.clicked("Refresh projects")
+    def refresh_projects(self, _):
+        self.noko.refresh_projects()
+
     @rumps.clicked("Quit")
     def quit(self, _):
         self.deck.shutdown()
