@@ -62,8 +62,8 @@ class NokoularApp(rumps.App):
     _current_state = None
     _description_window = None
 
-    def __init__(self):
-        super().__init__("Z:!" if MODE == "Zei" else "D:!")
+    def __init__(self, *args, **kwargs):
+        super().__init__("Z:!" if MODE == "Zei" else "D:!", **kwargs)
         self.menu = ["Not logging", "..."]
         if MODE == "Zei":
             self.zei = Zei.alloc().initWithDelegate_(self)
@@ -92,6 +92,11 @@ class NokoularApp(rumps.App):
         # Forces the current entry to be saved and the timer stopped
         # Acts as if the Zei has been upended to pause tracking.
         self.zei_didUpdateOrientation_(self.zei, 0)
+
+    @rumps.clicked("Quit")
+    def quit(self, _):
+        self.deck.shutdown()
+        rumps.quit_application()
 
     @rumps.clicked("...")
     def set_description(self, _):
@@ -232,7 +237,7 @@ def notification_handler(data):
 
 def main():
     global app
-    app = NokoularApp()
+    app = NokoularApp(quit_button=None)
     app.run()
 
 

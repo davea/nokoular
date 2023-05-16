@@ -31,6 +31,10 @@ class Deck(NSObject):
         self._delegate.deck_didReceiveButtonPress_(self, key_index, project, tags)
 
     def __del__(self):
+        self.shutdown()
+
+    def shutdown(self):
         if self._manager:
             self._manager.setBrightness(0)
             self._manager.shutdown()
+            self._manager = None
