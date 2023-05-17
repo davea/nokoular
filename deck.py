@@ -21,6 +21,7 @@ class Deck(NSObject):
         return self
 
     def key_press_callback(self, args, key_index):
+        self._manager.highlightedKeyIndex = key_index
         self.pyobjc_performSelectorOnMainThread_withObject_waitUntilDone_("updateTimerWithArgs:", [args, key_index], False)
 
     def updateTimerWithArgs_(self, args):
