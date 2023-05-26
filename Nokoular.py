@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from textwrap import shorten
 
 import rumps
+from rumps import events
 from humanfriendly import format_timespan
 from AppKit import NSTextField, NSApplication
 
@@ -68,9 +69,16 @@ class NokoularApp(rumps.App):
         if MODE == "Zei":
             self.zei = Zei.alloc().initWithDelegate_(self)
         else:
-            self.deck = Deck.alloc().initWithDelegate_(self)
+            self.init_deck()
         self.noko = Noko(NOKO_TOKEN)
         self._setup_windows()
+        self._setup_events()
+
+    def _setup_events(self):
+        events.on_screen_change.register(self.reload_deck)
+        events.on_screen_wake.register(self.reload_deck)
+        events.on_wake.register(self.reload_deck)
+        events.before_quit.register(self.shutdown_deck)
 
     def _setup_windows(self):
         self._description_window = rumps.Window(
@@ -97,8 +105,38 @@ class NokoularApp(rumps.App):
     def refresh_projects(self, _):
         self.noko.refresh_projects()
 
-    def terminate(self):
-        self.deck.shutdown()
+    @rumps.clicked("Reload Stream Deck")
+    def reload_deck_click(self, _):
+        self.reload_deck()
+
+    def reload_deck(self):
+        if MODE != "StreamDeck":
+            return
+
+        log.debug("Reloading Stream Deck...")
+        self.shutdown_deck()
+        self.init_deck()
+
+    def init_deck(self):
+        if MODE != "StreamDeck":
+            return
+
+        if self.deck:
+            self.shutdown_deck()
+
+        try:
+            self.deck = Deck.alloc().initWithDelegate_(self)
+            log.debug("OK")
+        except:
+            log.warning("Couldn't reload Stream Deck")
+
+    def shutdown_deck(self):
+        try:
+            self.deck.shutdown()
+            del self.deck
+            self.deck = None
+        except:
+            pass
 
     @rumps.clicked("...")
     def set_description(self, _):
@@ -229,7 +267,7 @@ class NokoularApp(rumps.App):
 @rumps.notifications
 def notification_handler(data):
     log.debug(f"notification_handler: {data}")
-    description = data["response"].string() if data["response"] else ""
+    description = data.response or ""
     if data["old_tags"]:
         description = f"{data['old_tags']} {description}"
     app.switch_timer(
